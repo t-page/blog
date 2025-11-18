@@ -28,7 +28,7 @@ async function base64encode(input: (plain: string) => Promise<ArrayBuffer>): Pro
 const codeChallenge: Promise<string> = base64encode(() => sha256(codeVerifier));
 
 const clientId = '6051dc7872fc4d978f770adfc1bcdaf7';
-const redirectUri = 'https://192.168.1.147:3000';
+const redirectUri = 'https://t-page.github.io/blog/';
 
 const scope: string = 'user-read-private user-read-email';
 const authUrl: URL = new URL("https://accounts.spotify.com/authorize")
