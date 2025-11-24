@@ -25,16 +25,34 @@ async function base64encode(input: (plain: string) => Promise<ArrayBuffer>): Pro
         .replace(/\//g, '_');
 
 }
-const codeChallenge: Promise<string> = base64encode(() => sha256(codeVerifier));
+
 
 const clientId = '6051dc7872fc4d978f770adfc1bcdaf7';
 const redirectUri = 'https://t-page.github.io/blog/';
 
-// const scope: string = 'user-read-private user-read-email';
-// const authUrl: URL = new URL("https://accounts.spotify.com/authorize")
+const scope: string = 'user-read-private user-read-email';
+const authUrl: URL = new URL("https://accounts.spotify.com/authorize?")
 
 // generated in the previous step
-window.localStorage.setItem('code_verifier', codeVerifier);
+
+const codeChallenge = await base64encode(() => sha256(codeVerifier));
+
+export function redirectToSpotify() {
+    window.localStorage.setItem('code_verifier', codeVerifier);
+    sha256(codeVerifier).then(hashed => {
+
+        const params = new URLSearchParams({
+            response_type: "code",
+            client_id: clientId,
+            redirect_uri: redirectUri,
+            scope,
+            code_challenge_method: "S256",
+            code_challenge: codeChallenge
+        })
+
+        window.location.href = authUrl + params.toString();
+    });
+}
 
 export async function getToken(code: any): Promise<any> {
     // stored in the previous step
@@ -59,5 +77,6 @@ export async function getToken(code: any): Promise<any> {
     const body = await fetch(url, payload);
     const response = await body.json();
 
-    return response.access_token
+    localStorage.setItem("access_token", response.access_token);
+    window.history.replaceState({}, document.title, "/")
 }

@@ -8,7 +8,7 @@ import Contact from './Contact';
 import Footer from "./Footer";
 import BpmButton from "../elements/button";
 import {useSpotify} from "../functionality/useSpotify";
-import {getToken} from "../functionality/generateToken";
+import {getToken, redirectToSpotify} from "../functionality/generateToken";
 import * as O from "fp-ts/Option";
 
 interface SpotifyAudioAnalysis {
@@ -35,9 +35,19 @@ interface SpotifyAudioAnalysis {
 const App: React.FC = () => {
     useEffect(() => {
         const init = async () => {
-            if(!localStorage.getItem('access_token')) {
-                const code = new URLSearchParams(window.location.search).get('code') ?? "";
-                console.log("Hi, how's it going?")
+            const params = new URLSearchParams(window.location.search)
+            const code = params.get("code")
+            const token = localStorage.getItem("access_token")
+            console.log("Hi, how's it going?")
+
+            if(!token && !code) {
+                redirectToSpotify();
+                return;
+            }
+
+            if(!token && code) {
+                getToken(code)
+            }
 
                 if (code === "") {
                     console.log("PASSING THROUGH")
@@ -50,7 +60,6 @@ const App: React.FC = () => {
                     window.history.replaceState({}, document.title, "/");
                 }
             }
-        };
 
         init();
     }, [])
