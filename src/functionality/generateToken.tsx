@@ -30,13 +30,13 @@ const codeChallenge: Promise<string> = base64encode(() => sha256(codeVerifier));
 const clientId = '6051dc7872fc4d978f770adfc1bcdaf7';
 const redirectUri = 'https://t-page.github.io/blog/';
 
-const scope: string = 'user-read-private user-read-email';
-const authUrl: URL = new URL("https://accounts.spotify.com/authorize")
+// const scope: string = 'user-read-private user-read-email';
+// const authUrl: URL = new URL("https://accounts.spotify.com/authorize")
 
 // generated in the previous step
 window.localStorage.setItem('code_verifier', codeVerifier);
 
-async function getToken(code: any): Promise<TaskOption<string>> {
+export async function getToken(code: any): Promise<any> {
     // stored in the previous step
     const codeVerifier: string = localStorage.getItem('code_verifier') ?? '';
 
@@ -55,46 +55,9 @@ async function getToken(code: any): Promise<TaskOption<string>> {
         }),
     }
 
+    console.log("MAKING THE CALL")
     const body = await fetch(url, payload);
     const response = await body.json();
 
-    localStorage.setItem('access_token', response.access_token);
-    console.log("YOYOYOYOYOYOOYYO");
-    console.log(response.access_token);
-
-    return () => response.access_token
-}
-
-const rawParams = {
-    response_type: "code",
-    client_id: clientId,
-    scope,
-    code_challenge_method: "S256",
-    code_challenge: codeChallenge, // Promise
-    redirect_uri: redirectUri,
-};
-
-const resolvedParams = {
-    ...rawParams,
-    code_challenge: await rawParams.code_challenge,
-};
-
-function extractedCode(): string | null {
-    authUrl.search = new URLSearchParams(resolvedParams).toString();
-    window.location.href = authUrl.toString();
-
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('code');
-}
-
-const resolvedToken = {
-    token: await getToken(extractedCode())
-}
-
-export function createToken(): TaskOption<string> {
-    if (localStorage.getItem('access_token') == null) {
-        return resolvedToken.token
-    } else {
-        return TO.fromNullable(localStorage.getItem('access_token'))
-    }
+    return response.access_token
 }

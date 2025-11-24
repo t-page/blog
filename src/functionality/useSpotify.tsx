@@ -1,7 +1,6 @@
 import {useState} from "react";
-import {TaskOption} from "fp-ts/TaskOption";
 
-export function useSpotify<T>(token: TaskOption<any>)   {
+export function useSpotify<T>(token: string)   {
     const [data, setData] = useState<T | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);

@@ -1,5 +1,5 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import React, {useEffect} from 'react';
+import {Route, Routes} from 'react-router-dom';
 import '../styles/App.css';
 import Header from './Header';
 import Home from './Home';
@@ -8,9 +8,8 @@ import Contact from './Contact';
 import Footer from "./Footer";
 import BpmButton from "../elements/button";
 import {useSpotify} from "../functionality/useSpotify";
-import {createToken} from "../functionality/generateToken";
-import * as TO from "fp-ts/TaskOption";
-import {TaskOption} from "fp-ts/TaskOption";
+import {getToken} from "../functionality/generateToken";
+import * as O from "fp-ts/Option";
 
 interface SpotifyAudioAnalysis {
     "danceability": number,
@@ -34,16 +33,30 @@ interface SpotifyAudioAnalysis {
 }
 
 const App: React.FC = () => {
-    let token: TaskOption<any>
-    const possibleToken: string = localStorage.getItem('access_token')?? '';
+    useEffect(() => {
+        const init = async () => {
+            if(!localStorage.getItem('access_token')) {
+                const code = new URLSearchParams(window.location.search).get('code') ?? "";
+                console.log("Hi, how's it going?")
 
-    if(localStorage.getItem('access_token') === null) {
-        token = createToken()
-    } else {
-        token = TO.fromNullable(possibleToken)
-    }
+                if (code === "") {
+                    console.log("PASSING THROUGH")
+                    const tokenTask = await getToken(code);
+                    const optionToken = await tokenTask;
+                    const token = O.getOrElse(() => "")(optionToken)
+                    localStorage.setItem("access_token", "token");
+                    localStorage.setItem("sillyBilly", token);
 
-    const { data, loading, error, makeCall } = useSpotify<SpotifyAudioAnalysis>(token);
+                    window.history.replaceState({}, document.title, "/");
+                }
+            }
+        };
+
+        init();
+    }, [])
+
+    const storedToken = localStorage.getItem("access_token") ?? ""
+    const { data, loading, error, makeCall } = useSpotify<SpotifyAudioAnalysis>(storedToken);
 
     return (
         <>
