@@ -5,16 +5,17 @@ export function useSpotify<T>(token: string)   {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const makeCall = async (url: string) => {
+    const makeCall = async () => {
         setLoading(true);
         setError(null);
 
         try {
-            const res = await fetch(url, {
-                method: "GET",
-                headers: {
-                    "Content-Type":"application/json",
-                    "Authorization": `Bearer ${token}`,
+            const res = await fetch("https://api.spotify.com/v1/audio-features/2takcwOaAZWiXQijPHIx7B",
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type":"application/json",
+                        "Authorization": "Bearer BQBOCNT2-nXqXKUwMqR0Lsoftj4gP8MSdXKUuCt35FyDsS7DJnbaWIGGeCoWBvgq9DUQXllazI2qa541f9zwsRzyKewWvyqfP26EnQVaXfM8o0Hlxp2f0EwN0GeWJ2RbV7GNNZgH4N_RclIb6OVcQky6emNEV2Hh9ugmgtPsMlcAKvOpfca8qNG5zYsaCB7LCJOqCsTTF1_eVuUSwbW2eJhjANjVRCOKQYyGwOA",
                 },
             });
 

@@ -9,7 +9,6 @@ import Footer from "./Footer";
 import BpmButton from "../elements/button";
 import {useSpotify} from "../functionality/useSpotify";
 import {getToken, redirectToSpotify} from "../functionality/generateToken";
-import * as O from "fp-ts/Option";
 
 interface SpotifyAudioAnalysis {
     "danceability": number,
@@ -48,24 +47,13 @@ const App: React.FC = () => {
             if(!token && code) {
                 getToken(code)
             }
-
-                if (code === "") {
-                    console.log("PASSING THROUGH")
-                    const tokenTask = await getToken(code);
-                    const optionToken = await tokenTask;
-                    const token = O.getOrElse(() => "")(optionToken)
-                    localStorage.setItem("access_token", "token");
-                    localStorage.setItem("sillyBilly", token);
-
-                    window.history.replaceState({}, document.title, "/");
-                }
-            }
+        }
 
         init();
     }, [])
 
     const storedToken = localStorage.getItem("access_token") ?? ""
-    const { data, loading, error, makeCall } = useSpotify<SpotifyAudioAnalysis>(storedToken);
+    const { makeCall } = useSpotify<SpotifyAudioAnalysis>(storedToken);
 
     return (
         <>
@@ -76,7 +64,7 @@ const App: React.FC = () => {
                     <Route path="/about" element={<About name={"Wings"}/>} />
                     <Route path="/contact" element={<Contact />} />
                 </Routes>
-                <BpmButton name={"call spotify"} onClick={() => makeCall("")} />
+                <BpmButton name={"call spotify"} onClick={() => makeCall()} />
             </main>
             <Footer />
         </>
